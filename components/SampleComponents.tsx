@@ -74,7 +74,7 @@ const SampleComponents = ({
 			<div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
 				{/* Primary Card */}
 				<ColorTooltip colors={{ Primary: baseColor, Text: getContrastColor(baseColor) }}>
-					<div className='rounded-lg shadow-lg p-6' style={{ backgroundColor: baseColor }}>
+					<div className='rounded-lg shadow-lg p-6 ' style={{ backgroundColor: baseColor }}>
 						<h3 className='text-xl font-semibold mb-2' style={{ color: getContrastColor(baseColor) }}>
 							Customers
 						</h3>
@@ -217,13 +217,13 @@ const SampleComponents = ({
 			</div>
 
 			{/* Buttons Row */}
-			<div className='space-y-4'>
+			<div className='rounded-lg shadow-lg p-6 space-y-4' style={{ backgroundColor: colorScale['100'] }}>
 				<h3 className='text-xl font-semibold' style={{ color: colorScale['700'] }}>
 					Buttons
 				</h3>
 				<div className='space-y-4'>
 					<div>
-						<h4 className='text-lg mb-2' style={{ color: colorScale['600'] }}>
+						<h4 className='text-lg mb-2 font-semibold' style={{ color: colorScale['600'] }}>
 							Primary
 						</h4>
 						<div className='space-x-2'>
@@ -256,7 +256,7 @@ const SampleComponents = ({
 					</div>
 					{secondaryColor && (
 						<div>
-							<h4 className='text-lg mb-2' style={{ color: colorScale['600'] }}>
+							<h4 className='text-lg mb-2 font-semibold' style={{ color: colorScale['600'] }}>
 								Secondary
 							</h4>
 							<div className='space-x-2'>
@@ -289,7 +289,7 @@ const SampleComponents = ({
 						</div>
 					)}
 					<div>
-						<h4 className='text-lg mb-2' style={{ color: colorScale['600'] }}>
+						<h4 className='text-lg mb-2 font-semibold' style={{ color: colorScale['600'] }}>
 							Outline
 						</h4>
 						<div className='space-x-2'>
@@ -321,7 +321,10 @@ const SampleComponents = ({
 
 			{/* Alert */}
 			<div className='space-y-4'>
-				<h3 className='text-xl font-semibold' style={{ color: colorScale['700'] }}>
+				<h3
+					className='text-xl font-semibold'
+					style={{ color: theme === 'dark' ? colorScale['100'] : colorScale['700'] }}
+				>
 					Alert
 				</h3>
 				<ColorTooltip colors={{ Background: colorScale['100'], Border: baseColor, Text: colorScale['800'] }}>

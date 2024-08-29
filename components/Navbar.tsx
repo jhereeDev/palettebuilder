@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ModeToggle } from '@/components/common/mode-toggle';
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
+import Image from 'next/image';
 
 export default function Navbar() {
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -19,7 +20,7 @@ export default function Navbar() {
 				<div className='flex justify-between h-16'>
 					<div className='flex'>
 						<div className='flex-shrink-0 flex items-center'>
-							<img src='/favicon.ico' className='h-8 w-8' />
+							<Image src='/favicon.ico' className='h-8 w-8' alt='logo' width={8} height={8} />
 							<span className='ml-2 text-xl font-bold'>Palette Builder</span>
 						</div>
 						<div className='hidden sm:ml-6 sm:flex sm:space-x-8'>
