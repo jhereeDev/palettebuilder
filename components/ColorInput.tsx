@@ -168,7 +168,7 @@ export default function ColorInput({ onColorChange, onSecondaryColorChange }: Co
 				/>
 				<Button
 					onClick={() => generateRandomColor()}
-					className='inline-flex items-center px-3 rounded-r-md border border-l-0 border-gray-300 bg-gray-50  text-sm hover:bg-gray-100 mx-2'
+					className='inline-flex items-center px-3 rounded-r-md border border-l-0 border-gray-300 text-sm  mx-2'
 				>
 					Random
 				</Button>
@@ -227,7 +227,7 @@ export default function ColorInput({ onColorChange, onSecondaryColorChange }: Co
 						/>
 						<Button
 							onClick={() => generateRandomColor(true)}
-							className='inline-flex items-center px-3 rounded-r-md border border-l-0 border-gray-300 bg-gray-50  text-sm hover:bg-gray-100 mx-2'
+							className='inline-flex items-center px-3 rounded-r-md border border-l-0 border-gray-300 text-sm mx-2'
 						>
 							Random
 						</Button>
