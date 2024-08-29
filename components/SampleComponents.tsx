@@ -217,7 +217,7 @@ const SampleComponents = ({
 			</div>
 
 			{/* Buttons Row */}
-			<div className='rounded-lg shadow-lg p-6 space-y-4' style={{ backgroundColor: colorScale['100'] }}>
+			<div className='rounded-lg shadow-lg p-6 space-y-4' style={{ backgroundColor: '#fff' }}>
 				<h3 className='text-xl font-semibold' style={{ color: colorScale['700'] }}>
 					Buttons
 				</h3>
