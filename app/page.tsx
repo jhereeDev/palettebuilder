@@ -59,19 +59,10 @@ export default function Home() {
 		}
 	}, [secondaryColor, baseColor]);
 
-	const titleColor = theme === 'dark' ? generateColorScale(baseColor)[100] : generateColorScale(baseColor)[800];
-
 	return (
 		<main className='container mx-auto p-4'>
 			<div className='mb-8'>
-				<h1
-					className='text-3xl font-bold mb-2'
-					style={{
-						color: titleColor,
-					}}
-				>
-					{colorName.charAt(0).toUpperCase() + colorName.slice(1)}
-				</h1>
+				<h1 className='text-3xl font-bold mb-2'>{colorName.charAt(0).toUpperCase() + colorName.slice(1)}</h1>
 				<ColorInput onColorChange={handleColorChange} onSecondaryColorChange={handleSecondaryColorChange} />
 			</div>
 			{isValidColor && (

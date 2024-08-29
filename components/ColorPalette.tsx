@@ -32,7 +32,7 @@ const ColorPalette: React.FC<ColorPaletteProps> = ({
 	const [showSave, setShowSave] = useState(false);
 
 	useEffect(() => {
-		if (!secondaryColor) {
+		if (secondaryColor === undefined) {
 			// Reset color palette when secondary color is removed
 			const newColorScale = generateColorScale(baseColor);
 			onUpdateColorScale(newColorScale);
@@ -69,7 +69,9 @@ const ColorPalette: React.FC<ColorPaletteProps> = ({
 	return (
 		<div className='mb-4 sm:mb-6 md:mb-8'>
 			<div className='flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2 sm:mb-4'>
-				<h2 className='text-xl sm:text-2xl font-semibold mb-2 sm:mb-0'>{colorName} Color Palette</h2>
+				<h2 className='text-xl sm:text-2xl font-semibold mb-2 sm:mb-0'>
+					{colorName.charAt(0).toUpperCase() + colorName.slice(1)} Color Palette
+				</h2>
 				<div className='flex flex-wrap gap-2 text-xs sm:text-sm'>
 					<Button variant='outline' size='sm' onClick={() => setShowContrastGrid(true)}>
 						Contrast grid

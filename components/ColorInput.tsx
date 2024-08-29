@@ -130,15 +130,21 @@ export default function ColorInput({ onColorChange, onSecondaryColorChange }: Co
 
 	const toggleSecondaryInput = () => {
 		setShowSecondaryInput(!showSecondaryInput);
-		if (!showSecondaryInput) {
+		if (showSecondaryInput) {
 			setSecondaryColor(undefined);
 			onSecondaryColorChange(undefined);
 		}
 	};
 
+	const handleColorPickerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const newColor = e.target.value;
+		setInputColor(newColor);
+		validateColor(newColor);
+	};
+
 	return (
 		<div className='mb-4 relative'>
-			<label htmlFor='colorInput' className='block text-sm font-medium text-gray-700 mb-2'>
+			<label htmlFor='colorInput' className='block text-sm font-medium  mb-2'>
 				Enter a primary color (hex, RGB, HSL, or color name):
 			</label>
 			<div className='flex rounded-md shadow-sm mb-4'>
@@ -177,8 +183,17 @@ export default function ColorInput({ onColorChange, onSecondaryColorChange }: Co
 			{error && <p className='mt-2 text-sm text-red-600'>{error}</p>}
 			{colorName && !error && (
 				<div className='mt-2 flex items-center'>
-					<div className='w-6 h-6 rounded-full mr-2' style={{ backgroundColor: inputColor }}></div>
-					<p className='text-sm text-gray-600'>Mapped color: {colorName}</p>
+					<div className='relative w-8 h-8 mr-2'>
+						<div className='absolute inset-0 rounded-md border border-input' style={{ backgroundColor: inputColor }} />
+						<Input
+							type='color'
+							value={inputColor}
+							onChange={handleColorPickerChange}
+							className='absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10'
+							title='Choose color'
+						/>
+					</div>
+					<p className='text-sm'>Mapped color: {colorName}</p>
 				</div>
 			)}
 
