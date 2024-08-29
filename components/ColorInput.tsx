@@ -142,6 +142,12 @@ export default function ColorInput({ onColorChange, onSecondaryColorChange }: Co
 		validateColor(newColor);
 	};
 
+	const handleSecondaryColorPickerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const newColor = e.target.value;
+		setSecondaryColor(newColor);
+		validateColor(newColor, true);
+	};
+
 	return (
 		<div className='mb-4 relative'>
 			<label htmlFor='colorInput' className='block text-sm font-medium  mb-2'>
@@ -162,7 +168,7 @@ export default function ColorInput({ onColorChange, onSecondaryColorChange }: Co
 				/>
 				<Button
 					onClick={() => generateRandomColor()}
-					className='inline-flex items-center px-3 rounded-r-md border border-l-0 border-gray-300 bg-gray-50 text-gray-500 text-sm hover:bg-gray-100'
+					className='inline-flex items-center px-3 rounded-r-md border border-l-0 border-gray-300 bg-gray-50  text-sm hover:bg-gray-100 mx-2'
 				>
 					Random
 				</Button>
@@ -205,7 +211,7 @@ export default function ColorInput({ onColorChange, onSecondaryColorChange }: Co
 
 			{showSecondaryInput && (
 				<>
-					<label htmlFor='secondaryColorInput' className='block text-sm font-medium text-gray-700 mt-4 mb-2'>
+					<label htmlFor='secondaryColorInput' className='block text-sm font-medium  mt-4 mb-2'>
 						Enter a secondary color (hex, RGB, or HSL):
 					</label>
 					<div className='flex rounded-md shadow-sm'>
@@ -221,7 +227,7 @@ export default function ColorInput({ onColorChange, onSecondaryColorChange }: Co
 						/>
 						<Button
 							onClick={() => generateRandomColor(true)}
-							className='inline-flex items-center px-3 rounded-r-md border border-l-0 border-gray-300 bg-gray-50 text-gray-500 text-sm hover:bg-gray-100'
+							className='inline-flex items-center px-3 rounded-r-md border border-l-0 border-gray-300 bg-gray-50  text-sm hover:bg-gray-100 mx-2'
 						>
 							Random
 						</Button>
@@ -229,8 +235,20 @@ export default function ColorInput({ onColorChange, onSecondaryColorChange }: Co
 					{secondaryError && <p className='mt-2 text-sm text-red-600'>{secondaryError}</p>}
 					{secondaryColor && !secondaryError && (
 						<div className='mt-2 flex items-center'>
-							<div className='w-6 h-6 rounded-full mr-2' style={{ backgroundColor: secondaryColor }}></div>
-							<p className='text-sm text-gray-600'>Secondary color: {secondaryColor}</p>
+							<div className='relative w-8 h-8 mr-2'>
+								<div
+									className='absolute inset-0 rounded-md border border-input'
+									style={{ backgroundColor: secondaryColor }}
+								/>
+								<Input
+									type='color'
+									value={inputColor}
+									onChange={handleSecondaryColorPickerChange}
+									className='absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10'
+									title='Choose color'
+								/>
+							</div>
+							<p className='text-sm'>Secondary color: {colorName}</p>
 						</div>
 					)}
 				</>

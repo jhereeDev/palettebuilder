@@ -48,7 +48,7 @@ const ChartsBlock = ({
 			chart4: colors[3],
 			chart5: colors[4],
 		};
-	}, [baseColor, secondaryColor, colorScale]);
+	}, [secondaryColor, colorScale]);
 
 	const getContrastColor = (bgColor: string) => {
 		return chroma(bgColor).luminance() > 0.5 ? colorScale['900'] : colorScale['50'];

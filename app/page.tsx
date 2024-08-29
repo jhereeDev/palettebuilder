@@ -6,7 +6,6 @@ import ColorInput from '@/components/ColorInput';
 import ColorPalette from '@/components/ColorPalette';
 import SampleComponents from '@/components/SampleComponents';
 import { colorPalettes } from '@/lib/colors';
-import { useTheme } from 'next-themes';
 
 export default function Home() {
 	const [baseColor, setBaseColor] = useState('#F6F0C2');
@@ -14,7 +13,6 @@ export default function Home() {
 	const [colorName, setColorName] = useState('khaki 200');
 	const [colorScale, setColorScale] = useState({});
 	const [isValidColor, setIsValidColor] = useState(true);
-	const { theme } = useTheme();
 
 	const generateColorScale = (color: string) => {
 		const scale = chroma.scale(['white', color, 'black']).mode('lab').colors(9);
@@ -49,7 +47,7 @@ export default function Home() {
 	useEffect(() => {
 		const initialScale = colorPalettes[colorName.toLowerCase()] || generateColorScale(baseColor);
 		setColorScale(initialScale);
-	}, []);
+	}, [baseColor, colorName]);
 
 	// Reset color palette when secondary color is removed
 	useEffect(() => {
@@ -61,9 +59,11 @@ export default function Home() {
 
 	return (
 		<main className='container mx-auto p-4'>
-			<div className='mb-8'>
+			<div className='mb-8 text-center'>
 				<h1 className='text-3xl font-bold mb-2'>{colorName.charAt(0).toUpperCase() + colorName.slice(1)}</h1>
-				<ColorInput onColorChange={handleColorChange} onSecondaryColorChange={handleSecondaryColorChange} />
+				<div className='flex justify-center'>
+					<ColorInput onColorChange={handleColorChange} onSecondaryColorChange={handleSecondaryColorChange} />
+				</div>
 			</div>
 			{isValidColor && (
 				<>
