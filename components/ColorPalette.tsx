@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import chroma from 'chroma-js';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
@@ -10,17 +10,50 @@ import SavePalette from './SavePalette';
 
 interface ColorPaletteProps {
 	baseColor: string;
+	secondaryColor?: string;
 	colorName: string;
-	colorScale: { [key: number]: string };
-	onUpdateColorScale: (newColorScale: { [key: number]: string }) => void;
+	colorScale: { [key: string]: string };
+	onUpdateColorScale: (newColorScale: { [key: string]: string }) => void;
+	onUpdateSecondaryColor: (newColor: string | undefined) => void;
 }
 
-const ColorPalette: React.FC<ColorPaletteProps> = ({ baseColor, colorName, colorScale, onUpdateColorScale }) => {
+const ColorPalette: React.FC<ColorPaletteProps> = ({
+	baseColor,
+	secondaryColor,
+	colorName,
+	colorScale,
+	onUpdateColorScale,
+	onUpdateSecondaryColor,
+}) => {
 	const [copiedColor, setCopiedColor] = useState<string | null>(null);
 	const [showContrastGrid, setShowContrastGrid] = useState(false);
 	const [showExport, setShowExport] = useState(false);
 	const [showEdit, setShowEdit] = useState(false);
 	const [showSave, setShowSave] = useState(false);
+
+	useEffect(() => {
+		if (!secondaryColor) {
+			// Reset color palette when secondary color is removed
+			const newColorScale = generateColorScale(baseColor);
+			onUpdateColorScale(newColorScale);
+		}
+	}, [secondaryColor, baseColor, onUpdateColorScale]);
+
+	const generateColorScale = (color: string) => {
+		const scale = chroma.scale(['white', color, 'black']).mode('lab').colors(9);
+		return {
+			50: scale[0],
+			100: scale[1],
+			200: scale[2],
+			300: scale[3],
+			400: scale[4],
+			500: color,
+			600: scale[5],
+			700: scale[6],
+			800: scale[7],
+			900: scale[8],
+		};
+	};
 
 	const getContrastColor = (bgColor: string) => {
 		return chroma(bgColor).luminance() > 0.5 ? colorScale[900] : colorScale[50];
@@ -87,12 +120,44 @@ const ColorPalette: React.FC<ColorPaletteProps> = ({ baseColor, colorName, color
 					</TooltipProvider>
 				))}
 			</div>
+
+			{secondaryColor && (
+				<div className='mt-4'>
+					<h3 className='text-lg font-semibold mb-2'>Secondary Color</h3>
+					<div className='w-full h-12'>
+						<TooltipProvider>
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<button
+										onClick={() => copyToClipboard(secondaryColor)}
+										className='relative w-full h-full rounded overflow-hidden focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-transform hover:scale-105'
+										style={{ backgroundColor: secondaryColor }}
+									>
+										<div className='absolute inset-0 flex items-center justify-center'>
+											<span style={{ color: getContrastColor(secondaryColor) }}>{secondaryColor.toUpperCase()}</span>
+										</div>
+										{copiedColor === secondaryColor && (
+											<div className='absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white'>
+												Copied!
+											</div>
+										)}
+									</button>
+								</TooltipTrigger>
+								<TooltipContent>
+									<p>Click to copy: {secondaryColor}</p>
+								</TooltipContent>
+							</Tooltip>
+						</TooltipProvider>
+					</div>
+				</div>
+			)}
+
 			<Dialog open={showContrastGrid} onOpenChange={setShowContrastGrid}>
-				<DialogContent>
+				<DialogContent className='max-w-[95vw] w-full max-h-[95vh] h-full overflow-auto'>
 					<DialogHeader>
 						<DialogTitle>Contrast Grid</DialogTitle>
 					</DialogHeader>
-					<ContrastGrid colorScale={colorScale} onClose={() => setShowContrastGrid(false)} />
+					<ContrastGrid colorScale={colorScale} secondaryColor={secondaryColor} />
 				</DialogContent>
 			</Dialog>
 			<Dialog open={showExport} onOpenChange={setShowExport}>
@@ -100,7 +165,12 @@ const ColorPalette: React.FC<ColorPaletteProps> = ({ baseColor, colorName, color
 					<DialogHeader>
 						<DialogTitle>Export Palette</DialogTitle>
 					</DialogHeader>
-					<ExportPalette colorScale={colorScale} colorName={colorName} onClose={() => setShowExport(false)} />
+					<ExportPalette
+						colorScale={colorScale}
+						colorName={colorName}
+						secondaryColor={secondaryColor}
+						onClose={() => setShowExport(false)}
+					/>
 				</DialogContent>
 			</Dialog>
 			<Dialog open={showEdit} onOpenChange={setShowEdit}>
@@ -108,7 +178,12 @@ const ColorPalette: React.FC<ColorPaletteProps> = ({ baseColor, colorName, color
 					<DialogHeader>
 						<DialogTitle>Edit Palette</DialogTitle>
 					</DialogHeader>
-					<EditPalette colorScale={colorScale} onUpdateColorScale={onUpdateColorScale} />
+					<EditPalette
+						colorScale={colorScale}
+						secondaryColor={secondaryColor}
+						onUpdateColorScale={onUpdateColorScale}
+						onUpdateSecondaryColor={onUpdateSecondaryColor}
+					/>
 				</DialogContent>
 			</Dialog>
 			<Dialog open={showSave} onOpenChange={setShowSave}>
@@ -116,7 +191,7 @@ const ColorPalette: React.FC<ColorPaletteProps> = ({ baseColor, colorName, color
 					<DialogHeader>
 						<DialogTitle>Save Palette</DialogTitle>
 					</DialogHeader>
-					<SavePalette colorScale={colorScale} colorName={colorName} />
+					<SavePalette colorScale={colorScale} colorName={colorName} secondaryColor={secondaryColor} />
 				</DialogContent>
 			</Dialog>
 		</div>

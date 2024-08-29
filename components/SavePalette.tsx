@@ -5,15 +5,28 @@ import { Button } from '@/components/ui/button';
 interface SavePaletteProps {
 	colorScale: { [key: number]: string };
 	colorName: string;
+	secondaryColor?: string;
 }
 
-const SavePalette: React.FC<SavePaletteProps> = ({ colorScale, colorName }) => {
+const SavePalette: React.FC<SavePaletteProps> = ({ colorScale, colorName, secondaryColor }) => {
 	const [paletteName, setPaletteName] = useState(colorName);
 
 	const handleSave = () => {
-		const savedPalettes = JSON.parse(localStorage.getItem('savedPalettes') || '{}');
-		savedPalettes[paletteName] = colorScale;
-		localStorage.setItem('savedPalettes', JSON.stringify(savedPalettes));
+		const paletteData = {
+			name: paletteName,
+			primaryScale: colorScale,
+			secondaryColor: secondaryColor,
+		};
+
+		// Get existing palettes from localStorage
+		const existingPalettes = JSON.parse(localStorage.getItem('savedPalettes') || '[]');
+
+		// Add new palette
+		existingPalettes.push(paletteData);
+
+		// Save updated palettes to localStorage
+		localStorage.setItem('savedPalettes', JSON.stringify(existingPalettes));
+
 		alert(`Palette "${paletteName}" has been saved!`);
 	};
 

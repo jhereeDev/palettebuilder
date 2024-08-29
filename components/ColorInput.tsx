@@ -4,36 +4,36 @@ import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { colorNames, colorPalettes } from '@/lib/colors';
-
 import chroma from 'chroma-js';
 
 interface ColorInputProps {
-	onColorChange: (color: string, colorName: string, pallete: any) => void;
+	onColorChange: (color: string, colorName: string, palette: any) => void;
+	onSecondaryColorChange: (color: string | undefined) => void;
 }
 
-export default function ColorInput({ onColorChange }: ColorInputProps) {
+export default function ColorInput({ onColorChange, onSecondaryColorChange }: ColorInputProps) {
 	const [inputColor, setInputColor] = useState('#F6F0C2');
+	const [secondaryColor, setSecondaryColor] = useState<string | undefined>(undefined);
 	const [error, setError] = useState('');
+	const [secondaryError, setSecondaryError] = useState('');
 	const [colorName, setColorName] = useState('');
 	const [suggestions, setSuggestions] = useState<string[]>([]);
 	const [showSuggestions, setShowSuggestions] = useState(false);
+	const [showSecondaryInput, setShowSecondaryInput] = useState(false);
 	const inputRef = useRef<HTMLInputElement>(null);
 
 	const parseColorInput = (input: string): string | null => {
 		input = input.trim().toLowerCase();
 
-		// Check if it's a valid hex, rgb, or hsl color
 		if (chroma.valid(input)) {
 			return chroma(input).hex();
 		}
 
-		// Check for RGB format
 		const rgbMatch = input.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
 		if (rgbMatch) {
 			return chroma(rgbMatch.slice(1).map(Number)).hex();
 		}
 
-		// Check for HSL format
 		const hslMatch = input.match(/^hsl\((\d+),\s*(\d+)%?,\s*(\d+)%?\)$/);
 		if (hslMatch) {
 			const [h, s, l] = hslMatch.slice(1).map(Number);
@@ -64,16 +64,29 @@ export default function ColorInput({ onColorChange }: ColorInputProps) {
 		return { name: `${closestPalette} ${closestShade}`, palette: colorPalettes[closestPalette] };
 	};
 
-	const validateColor = (input: string) => {
+	const validateColor = (input: string, isSecondary: boolean = false) => {
 		const parsedColor = parseColorInput(input);
 		if (parsedColor) {
-			setError('');
-			const { name, palette } = findClosestNamedColor(parsedColor);
-			setColorName(name);
-			onColorChange(parsedColor, name, palette);
+			if (isSecondary) {
+				setSecondaryError('');
+				onSecondaryColorChange(parsedColor);
+				setSecondaryColor(parsedColor);
+			} else {
+				setError('');
+				const { name, palette } = findClosestNamedColor(parsedColor);
+				setColorName(name);
+				onColorChange(parsedColor, name, palette);
+			}
+			return true;
 		} else {
-			setError('Invalid color input. Please enter a valid hex, RGB, or HSL color.');
-			setColorName('');
+			const errorMessage = 'Invalid color input. Please enter a valid hex, RGB, or HSL color.';
+			if (isSecondary) {
+				setSecondaryError(errorMessage);
+			} else {
+				setError(errorMessage);
+				setColorName('');
+			}
+			return false;
 		}
 	};
 
@@ -81,12 +94,17 @@ export default function ColorInput({ onColorChange }: ColorInputProps) {
 		validateColor(inputColor);
 	}, [inputColor]);
 
-	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, isSecondary: boolean = false) => {
 		const value = e.target.value;
-		setInputColor(value);
-		const filtered = colorNames.filter((name) => name.toLowerCase().includes(value.toLowerCase()));
-		setSuggestions(filtered);
-		setShowSuggestions(filtered.length > 0);
+		if (isSecondary) {
+			setSecondaryColor(value);
+			validateColor(value, true);
+		} else {
+			setInputColor(value);
+			const filtered = colorNames.filter((name) => name.toLowerCase().includes(value.toLowerCase()));
+			setSuggestions(filtered);
+			setShowSuggestions(filtered.length > 0);
+		}
 	};
 
 	const handleSuggestionClick = (suggestion: string) => {
@@ -95,22 +113,35 @@ export default function ColorInput({ onColorChange }: ColorInputProps) {
 		validateColor(suggestion);
 	};
 
-	const generateRandomColor = () => {
+	const generateRandomColor = (isSecondary: boolean = false) => {
 		const randomColor = chroma.random().hex();
-		setInputColor(randomColor);
-		validateColor(randomColor);
+		if (isSecondary) {
+			setSecondaryColor(randomColor);
+			validateColor(randomColor, true);
+		} else {
+			setInputColor(randomColor);
+			validateColor(randomColor);
+		}
 	};
 
 	const handleBlur = () => {
 		setTimeout(() => setShowSuggestions(false), 200);
 	};
 
+	const toggleSecondaryInput = () => {
+		setShowSecondaryInput(!showSecondaryInput);
+		if (!showSecondaryInput) {
+			setSecondaryColor(undefined);
+			onSecondaryColorChange(undefined);
+		}
+	};
+
 	return (
 		<div className='mb-4 relative'>
-			<label htmlFor='colorInput' className='block text-sm font-medium text-gray-700'>
-				Enter a color (hex, RGB, HSL, or color name):
+			<label htmlFor='colorInput' className='block text-sm font-medium text-gray-700 mb-2'>
+				Enter a primary color (hex, RGB, HSL, or color name):
 			</label>
-			<div className='mt-1 flex rounded-md shadow-sm'>
+			<div className='flex rounded-md shadow-sm mb-4'>
 				<Input
 					ref={inputRef}
 					type='text'
@@ -120,11 +151,11 @@ export default function ColorInput({ onColorChange }: ColorInputProps) {
 						error ? 'border-red-500' : ''
 					}`}
 					value={inputColor}
-					onChange={handleInputChange}
+					onChange={(e) => handleInputChange(e)}
 					onBlur={handleBlur}
 				/>
 				<Button
-					onClick={generateRandomColor}
+					onClick={() => generateRandomColor()}
 					className='inline-flex items-center px-3 rounded-r-md border border-l-0 border-gray-300 bg-gray-50 text-gray-500 text-sm hover:bg-gray-100'
 				>
 					Random
@@ -149,6 +180,45 @@ export default function ColorInput({ onColorChange }: ColorInputProps) {
 					<div className='w-6 h-6 rounded-full mr-2' style={{ backgroundColor: inputColor }}></div>
 					<p className='text-sm text-gray-600'>Mapped color: {colorName}</p>
 				</div>
+			)}
+
+			<div className='mt-4'>
+				<Button onClick={toggleSecondaryInput} variant='outline'>
+					{showSecondaryInput ? 'Remove Secondary Color' : 'Add Secondary Color'}
+				</Button>
+			</div>
+
+			{showSecondaryInput && (
+				<>
+					<label htmlFor='secondaryColorInput' className='block text-sm font-medium text-gray-700 mt-4 mb-2'>
+						Enter a secondary color (hex, RGB, or HSL):
+					</label>
+					<div className='flex rounded-md shadow-sm'>
+						<Input
+							type='text'
+							name='secondaryColorInput'
+							id='secondaryColorInput'
+							className={`focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded-l-md sm:text-sm border-gray-300 ${
+								secondaryError ? 'border-red-500' : ''
+							}`}
+							value={secondaryColor || ''}
+							onChange={(e) => handleInputChange(e, true)}
+						/>
+						<Button
+							onClick={() => generateRandomColor(true)}
+							className='inline-flex items-center px-3 rounded-r-md border border-l-0 border-gray-300 bg-gray-50 text-gray-500 text-sm hover:bg-gray-100'
+						>
+							Random
+						</Button>
+					</div>
+					{secondaryError && <p className='mt-2 text-sm text-red-600'>{secondaryError}</p>}
+					{secondaryColor && !secondaryError && (
+						<div className='mt-2 flex items-center'>
+							<div className='w-6 h-6 rounded-full mr-2' style={{ backgroundColor: secondaryColor }}></div>
+							<p className='text-sm text-gray-600'>Secondary color: {secondaryColor}</p>
+						</div>
+					)}
+				</>
 			)}
 		</div>
 	);
