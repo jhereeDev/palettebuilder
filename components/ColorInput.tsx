@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { colorNames, colorPalettes } from '@/lib/colors';
 import chroma from 'chroma-js';
+import { useSubscription } from '@/hooks/useSubscription';
+import { useRouter } from 'next/navigation';
 
 interface ColorInputProps {
 	onColorChange: (color: string, colorName: string, palette: any) => void;
@@ -21,6 +23,8 @@ export default function ColorInput({ onColorChange, onSecondaryColorChange }: Co
 	const [showSuggestions, setShowSuggestions] = useState(false);
 	const [showSecondaryInput, setShowSecondaryInput] = useState(false);
 	const inputRef = useRef<HTMLInputElement>(null);
+	const { isPremium } = useSubscription();
+	const router = useRouter();
 
 	const parseColorInput = (input: string): string | null => {
 		input = input.trim().toLowerCase();
@@ -129,10 +133,15 @@ export default function ColorInput({ onColorChange, onSecondaryColorChange }: Co
 	};
 
 	const toggleSecondaryInput = () => {
-		setShowSecondaryInput(!showSecondaryInput);
-		if (showSecondaryInput) {
-			setSecondaryColor(undefined);
-			onSecondaryColorChange(undefined);
+		console.log(isPremium);
+		if (!isPremium) {
+			router.push('/pricing');
+		} else {
+			setShowSecondaryInput(!showSecondaryInput);
+			if (showSecondaryInput) {
+				setSecondaryColor(undefined);
+				onSecondaryColorChange(undefined);
+			}
 		}
 	};
 

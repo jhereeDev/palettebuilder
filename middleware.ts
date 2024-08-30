@@ -1,27 +1,39 @@
+// middleware.ts
+
 import { authMiddleware } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
+import { db } from '@/lib/db';
+import { users } from '@/lib/schema';
+import { eq } from 'drizzle-orm';
 
 export default authMiddleware({
 	publicRoutes: ['/', '/api/webhooks(.*)'],
-	afterAuth(auth, req) {
-		// Allow users to visit public routes
-		if (auth.isPublicRoute) {
-			return NextResponse.next();
-		}
-
-		// Handle users who aren't authenticated
+	async afterAuth(auth, req) {
 		if (!auth.userId && !auth.isPublicRoute) {
-			// Redirect to home page where they can use the sign-in component in the navbar
-			return NextResponse.redirect(new URL('/', req.url));
+			return NextResponse.redirect(new URL('/sign-in', req.url));
 		}
 
-		// Allow authenticated users to access protected routes
 		if (auth.userId) {
-			return NextResponse.next();
+			const user = await db.select().from(users).where(eq(users.clerkId, auth.userId)).limit(1);
+
+			if (user.length > 0) {
+				const subscription = user[0].subscriptionTier;
+
+				// Apply restrictions based on subscription tier
+				if (subscription === 'free') {
+					if (
+						req.nextUrl.pathname.startsWith('/api/savePalette') ||
+						req.nextUrl.pathname.startsWith('/api/editPalette') ||
+						req.nextUrl.pathname === '/browse' ||
+						req.nextUrl.pathname === '/contrast-grid'
+					) {
+						return NextResponse.redirect(new URL('/pricing', req.url));
+					}
+				}
+			}
 		}
 
-		// Redirect all other unauthorized access to the home page
-		return NextResponse.redirect(new URL('/', req.url));
+		return NextResponse.next();
 	},
 });
 

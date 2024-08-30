@@ -15,6 +15,13 @@
       "when": 1724989632729,
       "tag": "0001_sweet_morg",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1725005921111,
+      "tag": "0002_dizzy_ser_duncan",
+      "breakpoints": true
     }
   ]
 }

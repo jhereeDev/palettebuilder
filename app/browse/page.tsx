@@ -54,7 +54,7 @@ export default function BrowsePalettes() {
 			) {
 				items.push(
 					<PaginationItem key={i}>
-						<PaginationLink onClick={() => handlePageChange(i)} isActive={currentPage === i}>
+						<PaginationLink onClick={() => handlePageChange(i)} isActive={currentPage === i} className='cursor-pointer'>
 							{i}
 						</PaginationLink>
 					</PaginationItem>
@@ -94,14 +94,16 @@ export default function BrowsePalettes() {
 					<PaginationItem>
 						<PaginationPrevious
 							onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-							className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
+							className={currentPage === 1 ? 'pointer-events-none opacity-50 cursor-pointer' : 'cursor-pointer'}
 						/>
 					</PaginationItem>
 					{renderPaginationItems()}
 					<PaginationItem>
 						<PaginationNext
 							onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-							className={currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}
+							className={
+								currentPage === totalPages ? 'pointer-events-none opacity-50 cursor-pointer' : 'cursor-pointer'
+							}
 						/>
 					</PaginationItem>
 				</PaginationContent>
