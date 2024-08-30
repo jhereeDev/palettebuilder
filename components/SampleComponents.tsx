@@ -54,12 +54,7 @@ const SampleComponents = ({
 
 	return (
 		<div className='space-y-8'>
-			<h2
-				className='text-2xl font-bold mb-4'
-				style={{ color: theme === 'dark' ? colorScale['100'] : colorScale['800'] }}
-			>
-				Sample Components
-			</h2>
+			<h2 className='text-2xl font-bold mb-4'>Sample Components</h2>
 
 			<Tabs defaultValue='basic'>
 				<TabsList className='grid w-full grid-cols-2'>
