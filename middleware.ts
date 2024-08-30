@@ -10,7 +10,7 @@ export default authMiddleware({
 	publicRoutes: ['/', '/api/webhooks(.*)'],
 	async afterAuth(auth, req) {
 		if (!auth.userId && !auth.isPublicRoute) {
-			return NextResponse.redirect(new URL('/sign-in', req.url));
+			return NextResponse.redirect(new URL('/', req.url));
 		}
 
 		if (auth.userId) {
