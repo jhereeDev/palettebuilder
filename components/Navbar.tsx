@@ -1,18 +1,42 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ModeToggle } from '@/components/common/mode-toggle';
-import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
+import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from '@clerk/nextjs';
 import Image from 'next/image';
 
 export default function Navbar() {
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+	const { isSignedIn, user } = useUser();
 
 	const toggleMobileMenu = () => {
 		setIsMobileMenuOpen(!isMobileMenuOpen);
 	};
+
+	useEffect(() => {
+		if (isSignedIn && user) {
+			const saveUser = async () => {
+				try {
+					const response = await fetch('/api/saveUser', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({
+							clerkId: user.id,
+							email: user.primaryEmailAddress?.emailAddress,
+						}),
+					});
+					if (!response.ok) {
+						throw new Error('Failed to save user');
+					}
+				} catch (error) {
+					console.error('Error saving user:', error);
+				}
+			};
+			saveUser();
+		}
+	}, [isSignedIn, user]);
 
 	return (
 		<nav className='shadow-sm'>
@@ -25,7 +49,7 @@ export default function Navbar() {
 						</div>
 						<div className='hidden sm:ml-6 sm:flex sm:space-x-8'>
 							<Link
-								href='/create'
+								href='/'
 								className='inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium  hover:border-gray-300 '
 							>
 								Create

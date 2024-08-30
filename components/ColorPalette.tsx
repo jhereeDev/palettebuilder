@@ -1,3 +1,4 @@
+'use client';
 import React, { useState, useEffect } from 'react';
 import chroma from 'chroma-js';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -6,7 +7,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import ContrastGrid from './ContrastGrid';
 import ExportPalette from './ExportPalette';
 import EditPalette from './EditPalette';
-import SavePalette from './SavePalette';
+import { useUser } from '@clerk/nextjs';
+import { useToast } from '@/components/ui/use-toast';
+import { Loader2 } from 'lucide-react';
 
 interface ColorPaletteProps {
 	baseColor: string;
@@ -15,6 +18,7 @@ interface ColorPaletteProps {
 	colorScale: { [key: string]: string };
 	onUpdateColorScale: (newColorScale: { [key: string]: string }) => void;
 	onUpdateSecondaryColor: (newColor: string | undefined) => void;
+	showEditButton?: boolean; // New prop to control edit button visibility
 }
 
 const ColorPalette: React.FC<ColorPaletteProps> = ({
@@ -24,12 +28,15 @@ const ColorPalette: React.FC<ColorPaletteProps> = ({
 	colorScale,
 	onUpdateColorScale,
 	onUpdateSecondaryColor,
+	showEditButton = true, // Default to true for backwards compatibility
 }) => {
 	const [copiedColor, setCopiedColor] = useState<string | null>(null);
 	const [showContrastGrid, setShowContrastGrid] = useState(false);
 	const [showExport, setShowExport] = useState(false);
 	const [showEdit, setShowEdit] = useState(false);
-	const [showSave, setShowSave] = useState(false);
+	const { user } = useUser();
+	const [isSaving, setIsSaving] = useState(false);
+	const { toast } = useToast();
 
 	useEffect(() => {
 		if (secondaryColor === undefined) {
@@ -66,6 +73,47 @@ const ColorPalette: React.FC<ColorPaletteProps> = ({
 		});
 	};
 
+	const handleSavePalette = async () => {
+		if (!user) {
+			toast({
+				variant: 'destructive',
+				title: 'You must be signed in to save a palette',
+			});
+			return;
+		}
+
+		setIsSaving(true);
+		try {
+			const response = await fetch('/api/savePalette', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					clerkId: user.id,
+					name: colorName,
+					primaryColor: baseColor,
+					secondaryColor,
+					colorScale,
+				}),
+			});
+
+			if (!response.ok) {
+				throw new Error('Failed to save palette');
+			}
+
+			toast({
+				title: 'Palette saved successfully',
+			});
+		} catch (error) {
+			console.error('Error saving palette:', error);
+			toast({
+				variant: 'destructive',
+				title: 'Failed to save palette',
+			});
+		} finally {
+			setIsSaving(false);
+		}
+	};
+
 	return (
 		<div className='mb-4 sm:mb-6 md:mb-8'>
 			<div className='flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2 sm:mb-4'>
@@ -79,11 +127,19 @@ const ColorPalette: React.FC<ColorPaletteProps> = ({
 					<Button variant='outline' size='sm' onClick={() => setShowExport(true)}>
 						Export
 					</Button>
-					<Button variant='outline' size='sm' onClick={() => setShowEdit(true)}>
-						Edit
-					</Button>
-					<Button variant='outline' size='sm' onClick={() => setShowSave(true)}>
-						Save
+					{showEditButton && (
+						<Button variant='outline' size='sm' onClick={() => setShowEdit(true)}>
+							Edit
+						</Button>
+					)}
+					<Button variant='outline' size='sm' onClick={handleSavePalette} disabled={isSaving}>
+						{isSaving ? (
+							<>
+								Saving <Loader2 />
+							</>
+						) : (
+							'Save'
+						)}
 					</Button>
 				</div>
 			</div>
@@ -186,14 +242,6 @@ const ColorPalette: React.FC<ColorPaletteProps> = ({
 						onUpdateColorScale={onUpdateColorScale}
 						onUpdateSecondaryColor={onUpdateSecondaryColor}
 					/>
-				</DialogContent>
-			</Dialog>
-			<Dialog open={showSave} onOpenChange={setShowSave}>
-				<DialogContent>
-					<DialogHeader>
-						<DialogTitle>Save Palette</DialogTitle>
-					</DialogHeader>
-					<SavePalette colorScale={colorScale} colorName={colorName} secondaryColor={secondaryColor} />
 				</DialogContent>
 			</Dialog>
 		</div>

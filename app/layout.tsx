@@ -6,6 +6,7 @@ import { ThemeProvider } from '@/components/common/theme-provider';
 import { cn } from '@/lib/utils';
 import { neobrutalism } from '@clerk/themes';
 import Navbar from '@/components/Navbar';
+import { Toaster } from '@/components/ui/toaster';
 
 const fontSans = FontSans({
 	subsets: ['latin'],
@@ -29,9 +30,9 @@ export default function RootLayout({
 			<html lang='en' suppressHydrationWarning>
 				<body className={cn('min-h-screen bg-background font-sans antialiased', fontSans.variable)}>
 					<ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
-						{' '}
 						<Navbar />
 						{children}
+						<Toaster />
 					</ThemeProvider>
 				</body>
 			</html>
