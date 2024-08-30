@@ -17,7 +17,7 @@ import Loader from '@/components/Loader';
 export default function BrowsePalettes() {
 	const [currentPage, setCurrentPage] = useState(1);
 	const [isLoading, setIsLoading] = useState(true);
-	const palettesPerPage = 10;
+	const palettesPerPage = 6;
 	const totalPages = Math.ceil(colorNames.length / palettesPerPage);
 
 	useEffect(() => {

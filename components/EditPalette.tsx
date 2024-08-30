@@ -8,6 +8,10 @@ interface EditPaletteProps {
 	secondaryColor?: string;
 	onUpdateColorScale: (newColorScale: { [key: string]: string }) => void;
 	onUpdateSecondaryColor: (newColor: string | undefined) => void;
+	onSave?: (paletteName: string, colorScale: { [key: string]: string }, secondaryColor?: string) => void;
+	onClose: () => void;
+	paletteName?: string;
+	isNewPalette?: boolean;
 }
 
 const EditPalette: React.FC<EditPaletteProps> = ({
@@ -15,9 +19,14 @@ const EditPalette: React.FC<EditPaletteProps> = ({
 	secondaryColor,
 	onUpdateColorScale,
 	onUpdateSecondaryColor,
+	onSave,
+	onClose,
+	paletteName = '',
+	isNewPalette = false,
 }) => {
 	const [editedColors, setEditedColors] = useState(colorScale);
 	const [editedSecondaryColor, setEditedSecondaryColor] = useState(secondaryColor);
+	const [name, setName] = useState(paletteName);
 
 	const handleColorChange = (shade: string, value: string) => {
 		try {
@@ -40,10 +49,22 @@ const EditPalette: React.FC<EditPaletteProps> = ({
 	const handleSave = () => {
 		onUpdateColorScale(editedColors);
 		onUpdateSecondaryColor(editedSecondaryColor);
+		if (onSave) {
+			onSave(name, editedColors, editedSecondaryColor);
+			onClose();
+		}
+		onClose();
 	};
 
 	return (
 		<div className='space-y-4'>
+			<Input
+				type='text'
+				value={name}
+				onChange={(e) => setName(e.target.value)}
+				placeholder='Palette Name'
+				className='w-full'
+			/>
 			<div className='grid grid-cols-2 gap-2'>
 				{Object.entries(editedColors).map(([shade, color]) => (
 					<div key={shade} className='space-y-1'>
@@ -84,7 +105,7 @@ const EditPalette: React.FC<EditPaletteProps> = ({
 					className='w-full text-xs'
 				/>
 			</div>
-			<Button onClick={handleSave}>Save Changes</Button>
+			<Button onClick={handleSave}>{isNewPalette ? 'Save New Palette' : 'Update Palette'}</Button>
 		</div>
 	);
 };

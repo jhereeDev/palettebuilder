@@ -18,7 +18,7 @@ interface ColorPaletteProps {
 	colorScale: { [key: string]: string };
 	onUpdateColorScale: (newColorScale: { [key: string]: string }) => void;
 	onUpdateSecondaryColor: (newColor: string | undefined) => void;
-	showEditButton?: boolean; // New prop to control edit button visibility
+	showEditButton?: boolean;
 }
 
 const ColorPalette: React.FC<ColorPaletteProps> = ({
@@ -28,7 +28,7 @@ const ColorPalette: React.FC<ColorPaletteProps> = ({
 	colorScale,
 	onUpdateColorScale,
 	onUpdateSecondaryColor,
-	showEditButton = true, // Default to true for backwards compatibility
+	showEditButton = true,
 }) => {
 	const [copiedColor, setCopiedColor] = useState<string | null>(null);
 	const [showContrastGrid, setShowContrastGrid] = useState(false);
@@ -40,7 +40,6 @@ const ColorPalette: React.FC<ColorPaletteProps> = ({
 
 	useEffect(() => {
 		if (secondaryColor === undefined) {
-			// Reset color palette when secondary color is removed
 			const newColorScale = generateColorScale(baseColor);
 			onUpdateColorScale(newColorScale);
 		}
@@ -114,6 +113,10 @@ const ColorPalette: React.FC<ColorPaletteProps> = ({
 		}
 	};
 
+	const handleCloseEditDialog = () => {
+		setShowEdit(false);
+	};
+
 	return (
 		<div className='mb-4 sm:mb-6 md:mb-8'>
 			<div className='flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2 sm:mb-4'>
@@ -135,7 +138,7 @@ const ColorPalette: React.FC<ColorPaletteProps> = ({
 					<Button variant='outline' size='sm' onClick={handleSavePalette} disabled={isSaving}>
 						{isSaving ? (
 							<>
-								Saving <Loader />
+								<span className='mr-2'>Saving</span> <Loader />
 							</>
 						) : (
 							'Save'
@@ -241,6 +244,8 @@ const ColorPalette: React.FC<ColorPaletteProps> = ({
 						secondaryColor={secondaryColor}
 						onUpdateColorScale={onUpdateColorScale}
 						onUpdateSecondaryColor={onUpdateSecondaryColor}
+						onClose={handleCloseEditDialog}
+						isNewPalette={true}
 					/>
 				</DialogContent>
 			</Dialog>

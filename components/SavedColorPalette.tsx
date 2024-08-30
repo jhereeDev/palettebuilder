@@ -26,9 +26,10 @@ interface SavedColorPaletteProps {
 	name: string;
 	primaryColor: string;
 	secondaryColor?: string;
-	colorScale: { [key: number]: string };
+	colorScale: { [key: string]: string };
 	onDelete: (id: string) => void;
 	onUpdate: (id: string, updatedPalette: any) => void;
+	onEditComplete: () => void;
 }
 
 const SavedColorPalette: React.FC<SavedColorPaletteProps> = ({
@@ -39,13 +40,15 @@ const SavedColorPalette: React.FC<SavedColorPaletteProps> = ({
 	colorScale,
 	onDelete,
 	onUpdate,
+	onEditComplete,
 }) => {
 	const [copiedColor, setCopiedColor] = useState<string | null>(null);
 	const [isEditing, setIsEditing] = useState(false);
 	const { toast } = useToast();
 
 	const getContrastColor = (bgColor: string) => {
-		return chroma(bgColor).luminance() > 0.5 ? colorScale[900] : colorScale[50];
+		const luminance = chroma(bgColor).luminance();
+		return luminance > 0.5 ? '#000000' : '#ffffff';
 	};
 
 	const copyToClipboard = (color: string) => {
@@ -69,6 +72,7 @@ const SavedColorPalette: React.FC<SavedColorPaletteProps> = ({
 
 			onUpdate(id, updatedPalette);
 			setIsEditing(false);
+			onEditComplete();
 			toast({ title: 'Palette updated successfully' });
 		} catch (error) {
 			console.error('Error updating palette:', error);
@@ -77,21 +81,11 @@ const SavedColorPalette: React.FC<SavedColorPaletteProps> = ({
 	};
 
 	const handleDelete = async () => {
-		try {
-			const response = await fetch(`/api/deletePalette/${id}`, {
-				method: 'DELETE',
-			});
+		onDelete(id);
+	};
 
-			if (!response.ok) {
-				throw new Error('Failed to delete palette');
-			}
-
-			onDelete(id);
-			toast({ title: 'Palette deleted successfully' });
-		} catch (error) {
-			console.error('Error deleting palette:', error);
-			toast({ variant: 'destructive', title: 'Failed to delete palette' });
-		}
+	const handleCloseEditDialog = () => {
+		setIsEditing(false);
 	};
 
 	return (
@@ -99,7 +93,7 @@ const SavedColorPalette: React.FC<SavedColorPaletteProps> = ({
 			<CardHeader className='flex flex-row items-center justify-between'>
 				<CardTitle>{name}</CardTitle>
 				<div>
-					{/* <Dialog open={isEditing} onOpenChange={setIsEditing}>
+					<Dialog open={isEditing} onOpenChange={setIsEditing}>
 						<DialogTrigger asChild>
 							<Button variant='outline' size='icon'>
 								<Pencil className='h-4 w-4' />
@@ -114,9 +108,10 @@ const SavedColorPalette: React.FC<SavedColorPaletteProps> = ({
 								secondaryColor={secondaryColor}
 								onUpdateColorScale={(newColorScale) => handleEdit({ colorScale: newColorScale })}
 								onUpdateSecondaryColor={(newSecondaryColor) => handleEdit({ secondaryColor: newSecondaryColor })}
+								onClose={handleCloseEditDialog}
 							/>
 						</DialogContent>
-					</Dialog> */}
+					</Dialog>
 					<AlertDialog>
 						<AlertDialogTrigger asChild>
 							<Button variant='outline' size='icon' className='ml-2'>
@@ -139,7 +134,7 @@ const SavedColorPalette: React.FC<SavedColorPaletteProps> = ({
 				</div>
 			</CardHeader>
 			<CardContent>
-				<div className='grid grid-cols-5 sm:grid-cols-6 md:grid-cols-11 gap-1 sm:gap-2'>
+				<div className='grid grid-cols-5 sm:grid-cols-6 md:grid-cols-10 gap-1 sm:gap-2'>
 					{Object.entries(colorScale).map(([level, hex]) => (
 						<TooltipProvider key={level}>
 							<Tooltip>
@@ -150,7 +145,7 @@ const SavedColorPalette: React.FC<SavedColorPaletteProps> = ({
 										style={{ backgroundColor: hex }}
 									>
 										<div className='absolute inset-0 flex flex-col justify-between p-1 sm:p-2 text-[8px] sm:text-xs'>
-											<span style={{ color: getContrastColor(hex) }}>
+											<span style={{ color: getContrastColor(hex), textShadow: '0px 0px 2px rgba(0,0,0,0.5)' }}>
 												{level}
 												{level === '500' && (
 													<span className='ml-1 px-1 py-0.5 bg-white bg-opacity-30 rounded text-[6px] sm:text-[8px]'>
@@ -158,7 +153,9 @@ const SavedColorPalette: React.FC<SavedColorPaletteProps> = ({
 													</span>
 												)}
 											</span>
-											<span style={{ color: getContrastColor(hex) }}>{hex.toUpperCase()}</span>
+											<span style={{ color: getContrastColor(hex), textShadow: '0px 0px 2px rgba(0,0,0,0.5)' }}>
+												{hex.toUpperCase()}
+											</span>
 										</div>
 										{copiedColor === hex && (
 											<div className='absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-xs sm:text-sm'>
@@ -187,7 +184,11 @@ const SavedColorPalette: React.FC<SavedColorPaletteProps> = ({
 											style={{ backgroundColor: secondaryColor }}
 										>
 											<div className='absolute inset-0 flex items-center justify-center'>
-												<span style={{ color: getContrastColor(secondaryColor) }}>{secondaryColor.toUpperCase()}</span>
+												<span
+													style={{ color: getContrastColor(secondaryColor), textShadow: '0px 0px 2px rgba(0,0,0,0.5)' }}
+												>
+													{secondaryColor.toUpperCase()}
+												</span>
 											</div>
 											{copiedColor === secondaryColor && (
 												<div className='absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white'>
