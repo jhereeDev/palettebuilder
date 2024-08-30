@@ -134,14 +134,14 @@ export default function ColorInput({ onColorChange, onSecondaryColorChange }: Co
 
 	const toggleSecondaryInput = () => {
 		console.log(isPremium);
-		if (!isPremium) {
-			router.push('/pricing');
-		} else {
+		if (isPremium) {
 			setShowSecondaryInput(!showSecondaryInput);
 			if (showSecondaryInput) {
 				setSecondaryColor(undefined);
 				onSecondaryColorChange(undefined);
 			}
+		} else {
+			router.push('/pricing');
 		}
 	};
 
