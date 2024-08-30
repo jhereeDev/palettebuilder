@@ -9,7 +9,7 @@ import ExportPalette from './ExportPalette';
 import EditPalette from './EditPalette';
 import { useUser } from '@clerk/nextjs';
 import { useToast } from '@/components/ui/use-toast';
-import { Loader2 } from 'lucide-react';
+import Loader from './Loader';
 
 interface ColorPaletteProps {
 	baseColor: string;
@@ -135,7 +135,7 @@ const ColorPalette: React.FC<ColorPaletteProps> = ({
 					<Button variant='outline' size='sm' onClick={handleSavePalette} disabled={isSaving}>
 						{isSaving ? (
 							<>
-								Saving <Loader2 />
+								Saving <Loader />
 							</>
 						) : (
 							'Save'

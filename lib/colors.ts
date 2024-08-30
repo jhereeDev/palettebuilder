@@ -2226,3 +2226,13 @@ export const colorPalettes: { [key: string]: { [key: number]: string } } = {
 		900: '#264d00',
 	},
 };
+
+// Helper functions remain the same
+export const getColorPalette = (colorName: string) => {
+	return colorPalettes[colorName.toLowerCase()] || null;
+};
+
+export const getBaseColor = (colorName: string) => {
+	const palette = getColorPalette(colorName);
+	return palette ? palette[500] : null;
+};

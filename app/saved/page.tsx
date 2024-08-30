@@ -34,6 +34,14 @@ export default function SavedPalettes() {
 		}
 	};
 
+	const handleDelete = (id: string) => {
+		setPalettes(palettes.filter((palette) => palette.id !== id));
+	};
+
+	const handleUpdate = (id: string, updatedPalette: any) => {
+		setPalettes(palettes.map((palette) => (palette.id === id ? { ...palette, ...updatedPalette } : palette)));
+	};
+
 	if (isLoading) {
 		return (
 			<div className='flex justify-center items-center h-screen'>
@@ -46,15 +54,18 @@ export default function SavedPalettes() {
 		<div className='container mx-auto p-4'>
 			<h1 className='text-3xl font-bold mb-4'>Saved Palettes</h1>
 			{palettes.length === 0 ? (
-				<p className='text-center'>You haven&apos;t saved any palettes yet.</p>
+				<p>You haven&apos;t saved any palettes yet.</p>
 			) : (
 				palettes.map((palette) => (
 					<SavedColorPalette
 						key={palette.id}
+						id={palette.id}
 						name={palette.name}
 						primaryColor={palette.primaryColor}
 						secondaryColor={palette.secondaryColor}
 						colorScale={JSON.parse(palette.colorScale)}
+						onDelete={handleDelete}
+						onUpdate={handleUpdate}
 					/>
 				))
 			)}

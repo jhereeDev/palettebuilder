@@ -4,19 +4,48 @@ import React, { useState } from 'react';
 import chroma from 'chroma-js';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { useToast } from '@/components/ui/use-toast';
+import EditPalette from './EditPalette';
+import { Pencil, Trash2 } from 'lucide-react';
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 interface SavedColorPaletteProps {
+	id: string;
 	name: string;
 	primaryColor: string;
 	secondaryColor?: string;
-	colorScale: { [key: string]: string };
+	colorScale: { [key: number]: string };
+	onDelete: (id: string) => void;
+	onUpdate: (id: string, updatedPalette: any) => void;
 }
 
-const SavedColorPalette: React.FC<SavedColorPaletteProps> = ({ name, primaryColor, secondaryColor, colorScale }) => {
+const SavedColorPalette: React.FC<SavedColorPaletteProps> = ({
+	id,
+	name,
+	primaryColor,
+	secondaryColor,
+	colorScale,
+	onDelete,
+	onUpdate,
+}) => {
 	const [copiedColor, setCopiedColor] = useState<string | null>(null);
+	const [isEditing, setIsEditing] = useState(false);
+	const { toast } = useToast();
 
 	const getContrastColor = (bgColor: string) => {
-		return chroma(bgColor).luminance() > 0.5 ? '#000000' : '#ffffff';
+		return chroma(bgColor).luminance() > 0.5 ? colorScale[900] : colorScale[50];
 	};
 
 	const copyToClipboard = (color: string) => {
@@ -26,10 +55,88 @@ const SavedColorPalette: React.FC<SavedColorPaletteProps> = ({ name, primaryColo
 		});
 	};
 
+	const handleEdit = async (updatedPalette: any) => {
+		try {
+			const response = await fetch(`/api/editPalette/${id}`, {
+				method: 'PUT',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(updatedPalette),
+			});
+
+			if (!response.ok) {
+				throw new Error('Failed to update palette');
+			}
+
+			onUpdate(id, updatedPalette);
+			setIsEditing(false);
+			toast({ title: 'Palette updated successfully' });
+		} catch (error) {
+			console.error('Error updating palette:', error);
+			toast({ variant: 'destructive', title: 'Failed to update palette' });
+		}
+	};
+
+	const handleDelete = async () => {
+		try {
+			const response = await fetch(`/api/deletePalette/${id}`, {
+				method: 'DELETE',
+			});
+
+			if (!response.ok) {
+				throw new Error('Failed to delete palette');
+			}
+
+			onDelete(id);
+			toast({ title: 'Palette deleted successfully' });
+		} catch (error) {
+			console.error('Error deleting palette:', error);
+			toast({ variant: 'destructive', title: 'Failed to delete palette' });
+		}
+	};
+
 	return (
 		<Card className='mb-4'>
-			<CardHeader>
+			<CardHeader className='flex flex-row items-center justify-between'>
 				<CardTitle>{name}</CardTitle>
+				<div>
+					{/* <Dialog open={isEditing} onOpenChange={setIsEditing}>
+						<DialogTrigger asChild>
+							<Button variant='outline' size='icon'>
+								<Pencil className='h-4 w-4' />
+							</Button>
+						</DialogTrigger>
+						<DialogContent>
+							<DialogHeader>
+								<DialogTitle>Edit Palette</DialogTitle>
+							</DialogHeader>
+							<EditPalette
+								colorScale={colorScale}
+								secondaryColor={secondaryColor}
+								onUpdateColorScale={(newColorScale) => handleEdit({ colorScale: newColorScale })}
+								onUpdateSecondaryColor={(newSecondaryColor) => handleEdit({ secondaryColor: newSecondaryColor })}
+							/>
+						</DialogContent>
+					</Dialog> */}
+					<AlertDialog>
+						<AlertDialogTrigger asChild>
+							<Button variant='outline' size='icon' className='ml-2'>
+								<Trash2 className='h-4 w-4' />
+							</Button>
+						</AlertDialogTrigger>
+						<AlertDialogContent>
+							<AlertDialogHeader>
+								<AlertDialogTitle>Are you sure you want to delete this palette?</AlertDialogTitle>
+								<AlertDialogDescription>
+									This action cannot be undone. This will permanently delete your color palette.
+								</AlertDialogDescription>
+							</AlertDialogHeader>
+							<AlertDialogFooter>
+								<AlertDialogCancel>Cancel</AlertDialogCancel>
+								<AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+							</AlertDialogFooter>
+						</AlertDialogContent>
+					</AlertDialog>
+				</div>
 			</CardHeader>
 			<CardContent>
 				<div className='grid grid-cols-5 sm:grid-cols-6 md:grid-cols-11 gap-1 sm:gap-2'>

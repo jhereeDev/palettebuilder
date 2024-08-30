@@ -15,18 +15,21 @@ export default function Home() {
 	const [isValidColor, setIsValidColor] = useState(true);
 
 	const generateColorScale = (color: string) => {
-		const scale = chroma.scale(['white', color, 'black']).mode('lab').colors(9);
+		const base = chroma(color);
+		const lighterScale = chroma.scale(['white', color]).mode('lab').colors(6);
+		const darkerScale = chroma.scale([color, 'black']).mode('lab').colors(5).slice(1);
+
 		return {
-			'50': scale[0],
-			'100': scale[1],
-			'200': scale[2],
-			'300': scale[3],
-			'400': scale[4],
-			'500': color,
-			'600': scale[5],
-			'700': scale[6],
-			'800': scale[7],
-			'900': scale[8],
+			'50': lighterScale[0],
+			'100': lighterScale[1],
+			'200': lighterScale[2],
+			'300': lighterScale[3],
+			'400': lighterScale[4],
+			'500': base.hex(), // Use the exact base color for 500
+			'600': darkerScale[0],
+			'700': darkerScale[1],
+			'800': darkerScale[2],
+			'900': darkerScale[3],
 		};
 	};
 
