@@ -50,22 +50,24 @@ export default function Navbar() {
 						<div className='hidden sm:ml-6 sm:flex sm:space-x-8'>
 							<Link
 								href='/'
-								className='inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium  hover:border-gray-300 '
+								className='inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium hover:border-gray-300'
 							>
-								Create
+								Home
 							</Link>
-							<Link
-								href='/saved'
-								className='inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium  hover:border-gray-300 '
-							>
-								Saved
-							</Link>
-							<Link
-								href='/browse'
-								className='inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium  hover:border-gray-300 '
-							>
-								Browse
-							</Link>
+							<SignedIn>
+								<Link
+									href='/saved'
+									className='inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium hover:border-gray-300'
+								>
+									Saved
+								</Link>
+								<Link
+									href='/browse'
+									className='inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium hover:border-gray-300'
+								>
+									Browse
+								</Link>
+							</SignedIn>
 						</div>
 					</div>
 					<div className='hidden sm:ml-6 sm:flex sm:items-center'>
@@ -119,23 +121,25 @@ export default function Navbar() {
 			<div className={`sm:hidden ${isMobileMenuOpen ? 'block' : 'hidden'}`}>
 				<div className='pt-2 pb-3 space-y-1'>
 					<Link
-						href='/create'
+						href='/'
 						className='block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
 					>
-						Create
+						Home
 					</Link>
-					<Link
-						href='/saved'
-						className='block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
-					>
-						Saved
-					</Link>
-					<Link
-						href='/browse'
-						className='block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
-					>
-						Browse
-					</Link>
+					<SignedIn>
+						<Link
+							href='/saved'
+							className='block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
+						>
+							Saved
+						</Link>
+						<Link
+							href='/browse'
+							className='block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
+						>
+							Browse
+						</Link>
+					</SignedIn>
 				</div>
 				<div className='pt-4 pb-3 border-t border-gray-200 flex justify-between items-center'>
 					<div className='mx-2'>

@@ -46,7 +46,7 @@ export default function SavedPalettes() {
 		<div className='container mx-auto p-4'>
 			<h1 className='text-3xl font-bold mb-4'>Saved Palettes</h1>
 			{palettes.length === 0 ? (
-				<p>You haven&apos;t saved any palettes yet.</p>
+				<p className='text-center'>You haven&apos;t saved any palettes yet.</p>
 			) : (
 				palettes.map((palette) => (
 					<SavedColorPalette
