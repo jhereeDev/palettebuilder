@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import chroma from 'chroma-js';
+import { useSubscription } from '@/hooks/useSubscription';
 
 interface ExportPaletteProps {
 	colorScale: { [key: string]: string };
@@ -10,6 +11,7 @@ interface ExportPaletteProps {
 }
 
 const ExportPalette: React.FC<ExportPaletteProps> = ({ colorScale, colorName, secondaryColor, onClose }) => {
+	const { isPremium } = useSubscription();
 	const generateTailwindHex = () => {
 		const config = Object.entries(colorScale)
 			.map(([level, hex]) => `      '${level}': '${hex}',`)
@@ -139,23 +141,28 @@ ${swatches}${secondarySwatch}
 
 	return (
 		<div className='grid grid-cols-1 gap-1 md:gap-2 md:grid-cols-2'>
-			<Button onClick={() => downloadFile(generateTailwindHex(), `${colorName}-tailwind-hex.js`)}>
-				Tailwind (HEX)
-			</Button>
-			<Button onClick={() => downloadFile(generateTailwindOKLCH(), `${colorName}-tailwind-oklch.js`)}>
-				Tailwind (OKLCH)
-			</Button>
-			<Button onClick={() => downloadFile(generateTailwindHSL(), `${colorName}-tailwind-hsl.js`)}>
-				Tailwind (HSL)
-			</Button>
-			<Button onClick={() => downloadFile(generateSCSS(), `${colorName}-variables.scss`)}>SCSS Variables</Button>
 			<Button onClick={() => downloadFile(generateCSSHex(), `${colorName}-variables-hex.css`)}>
 				CSS Variables (HEX)
 			</Button>
-			<Button onClick={() => downloadFile(generateCSSRGB(), `${colorName}-variables-rgb.css`)}>
-				CSS Variables (RGB)
-			</Button>
-			<Button onClick={() => downloadFile(generateSVG(), `${colorName}-palette.svg`)}>SVG (for Figma)</Button>
+			{isPremium && (
+				<>
+					<Button onClick={() => downloadFile(generateTailwindHex(), `${colorName}-tailwind-hex.js`)}>
+						Tailwind (HEX)
+					</Button>
+					<Button onClick={() => downloadFile(generateTailwindOKLCH(), `${colorName}-tailwind-oklch.js`)}>
+						Tailwind (OKLCH)
+					</Button>
+					<Button onClick={() => downloadFile(generateTailwindHSL(), `${colorName}-tailwind-hsl.js`)}>
+						Tailwind (HSL)
+					</Button>
+					<Button onClick={() => downloadFile(generateSCSS(), `${colorName}-variables.scss`)}>SCSS Variables</Button>
+
+					<Button onClick={() => downloadFile(generateCSSRGB(), `${colorName}-variables-rgb.css`)}>
+						CSS Variables (RGB)
+					</Button>
+					<Button onClick={() => downloadFile(generateSVG(), `${colorName}-palette.svg`)}>SVG (for Figma)</Button>
+				</>
+			)}
 		</div>
 	);
 };

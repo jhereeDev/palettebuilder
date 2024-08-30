@@ -10,6 +10,7 @@ import EditPalette from './EditPalette';
 import { useUser } from '@clerk/nextjs';
 import { useToast } from '@/components/ui/use-toast';
 import Loader from './Loader';
+import { useSubscription } from '@/hooks/useSubscription';
 
 interface ColorPaletteProps {
 	baseColor: string;
@@ -37,6 +38,7 @@ const ColorPalette: React.FC<ColorPaletteProps> = ({
 	const { user } = useUser();
 	const [isSaving, setIsSaving] = useState(false);
 	const { toast } = useToast();
+	const { isPremium } = useSubscription();
 
 	useEffect(() => {
 		if (secondaryColor === undefined) {
@@ -124,18 +126,20 @@ const ColorPalette: React.FC<ColorPaletteProps> = ({
 					{colorName.charAt(0).toUpperCase() + colorName.slice(1)} Color Palette
 				</h2>
 				<div className='flex flex-wrap gap-2 text-xs sm:text-sm'>
-					<Button variant='outline' size='sm' onClick={() => setShowContrastGrid(true)}>
-						Contrast grid
-					</Button>
+					{isPremium && (
+						<Button variant='outline' size='sm' onClick={() => setShowContrastGrid(true)}>
+							Contrast grid
+						</Button>
+					)}
 					<Button variant='outline' size='sm' onClick={() => setShowExport(true)}>
 						Export
 					</Button>
-					{showEditButton && (
+					{isPremium && (
 						<Button variant='outline' size='sm' onClick={() => setShowEdit(true)}>
 							Edit
 						</Button>
 					)}
-					<Button variant='outline' size='sm' onClick={handleSavePalette} disabled={isSaving}>
+					<Button variant='outline' size='sm' onClick={handleSavePalette} disabled={isSaving || !isPremium}>
 						{isSaving ? (
 							<>
 								<span className='mr-2'>Saving</span> <Loader />
