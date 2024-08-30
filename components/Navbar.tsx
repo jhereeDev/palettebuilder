@@ -79,17 +79,17 @@ export default function Navbar() {
 						</div>
 					</div>
 					<div className='hidden sm:ml-6 sm:flex sm:items-center'>
-						<Button asChild className='mr-4 rounded-full'>
-							<Link href='/pricing'>Pricing</Link>
-						</Button>
-						<div className='mx-1 mt-2'>
-							<SignedOut>
-								<SignInButton />
-							</SignedOut>
-							<SignedIn>
+						<SignedOut>
+							<SignInButton />
+						</SignedOut>
+						<SignedIn>
+							<Button asChild className='mr-4 rounded-full'>
+								<Link href='/pricing'>Pricing</Link>
+							</Button>
+							<div className='mx-1 mt-2'>
 								<UserButton afterSignOutUrl='/' />
-							</SignedIn>
-						</div>
+							</div>
+						</SignedIn>
 						<div className='ml-4'>
 							<ModeToggle />
 						</div>
@@ -140,33 +140,36 @@ export default function Navbar() {
 						Home
 					</Link>
 					<SignedIn>
-						<Link
-							href='/saved'
-							className='block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
-						>
-							Saved
-						</Link>
-						<Link
-							href='/browse'
-							className='block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
-						>
-							Browse
-						</Link>
+						{isPremium && (
+							<>
+								<Link
+									href='/saved'
+									className='block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
+								>
+									Saved
+								</Link>
+								<Link
+									href='/browse'
+									className='block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
+								>
+									Browse
+								</Link>
+							</>
+						)}
 					</SignedIn>
 				</div>
 				<div className='pt-4 pb-3 border-t border-gray-200 flex justify-between items-center'>
-					<Button asChild className='ml-4 rounded-full'>
-						<Link href='/pricing'>Pricing</Link>
-					</Button>
-
-					<div className='mx-2'>
-						<SignedOut>
-							<SignInButton />
-						</SignedOut>
-						<SignedIn>
+					<SignedOut>
+						<SignInButton />
+					</SignedOut>
+					<SignedIn>
+						<Button asChild className='ml-4 rounded-full'>
+							<Link href='/pricing'>Pricing</Link>
+						</Button>
+						<div className='mx-2'>
 							<UserButton />
-						</SignedIn>
-					</div>
+						</div>
+					</SignedIn>
 					<div className='mx-2'>
 						<ModeToggle />
 					</div>
