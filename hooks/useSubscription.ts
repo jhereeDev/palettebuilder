@@ -5,33 +5,12 @@ import { useUser } from '@clerk/nextjs';
 
 export function useSubscription() {
 	const { user } = useUser();
-	const [subscriptionTier, setSubscriptionTier] = useState<string>('free');
-	const [subscriptionStatus, setSubscriptionStatus] = useState<string>('inactive');
-	const [isLoading, setIsLoading] = useState(true);
+	const [isLoading, setIsLoading] = useState(false);
 
-	useEffect(() => {
-		if (user) {
-			fetch(`/api/getUserSubscription?clerkUserId=${user.id}`)
-				.then((response) => response.json())
-				.then((data) => {
-					if (data.error) {
-						console.error('Error fetching subscription:', data.error);
-					} else {
-						setSubscriptionTier(data.subscriptionTier);
-						setSubscriptionStatus(data.subscriptionStatus);
-					}
-					setIsLoading(false);
-				})
-				.catch((error) => {
-					console.error('Error fetching subscription:', error);
-					setIsLoading(false);
-				});
-		} else {
-			setIsLoading(false);
-		}
-	}, [user]);
-
-	const isPremium = subscriptionTier !== 'free' && subscriptionStatus === 'active';
+	// All features are now accessible to all users
+	const isPremium = true;
+	const subscriptionTier = 'premium';
+	const subscriptionStatus = 'active';
 
 	return { subscriptionTier, subscriptionStatus, isPremium, isLoading };
 }
