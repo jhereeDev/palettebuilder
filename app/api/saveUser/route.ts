@@ -13,12 +13,28 @@ export async function POST(request: NextRequest) {
 	}
 
 	try {
-		const existingUser = await db.select().from(users).where(eq(users.clerkId, clerkId)).limit(1);
+		// First, check if user exists by clerkId
+		const existingUserByClerkId = await db.select().from(users).where(eq(users.clerkId, clerkId)).limit(1);
 
-		if (existingUser.length > 0) {
-			return NextResponse.json(existingUser[0], { status: 200 });
+		if (existingUserByClerkId.length > 0) {
+			return NextResponse.json(existingUserByClerkId[0], { status: 200 });
 		}
 
+		// If not found by clerkId, check if user exists by email
+		const existingUserByEmail = await db.select().from(users).where(eq(users.email, email)).limit(1);
+
+		if (existingUserByEmail.length > 0) {
+			// Update the existing user's clerkId
+			const updatedUser = await db
+				.update(users)
+				.set({ clerkId })
+				.where(eq(users.email, email))
+				.returning();
+			
+			return NextResponse.json(updatedUser[0], { status: 200 });
+		}
+
+		// If no existing user found, create a new one
 		const newUser = await db.insert(users).values({ clerkId, email }).returning();
 		return NextResponse.json(newUser[0], { status: 201 });
 	} catch (error) {
