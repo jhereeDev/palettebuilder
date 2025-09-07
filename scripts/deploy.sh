@@ -81,7 +81,7 @@ pm2 save
 pm2 startup
 
 print_status "Deployment completed successfully! 🎉"
-print_status "Application is running on http://192.168.1.12:3000"
+print_status "Application is running on http://192.168.1.12:3101"
 print_status "Use 'pm2 status' to check application status"
 print_status "Use 'pm2 logs palettebuilder' to view logs"
 print_status "Use 'pm2 restart palettebuilder' to restart the application"

@@ -168,7 +168,7 @@ sudo systemctl restart nginx
 
 ## Accessing Your Application
 
-- **Application**: http://192.168.1.12:3000
+- **Application**: http://192.168.1.12:3101
 - **Nginx Proxy**: http://192.168.1.12 (if configured)
 - **Database**: 192.168.1.12:5432
 - **Adminer**: http://192.168.1.12:8080
@@ -202,11 +202,11 @@ pm2 restart palettebuilder
 ### Port Issues
 
 ```bash
-# Check if port 3000 is in use
-sudo netstat -tlnp | grep :3000
+# Check if port 3101 is in use
+sudo netstat -tlnp | grep :3101
 
-# Kill process on port 3000
-sudo fuser -k 3000/tcp
+# Kill process on port 3101
+sudo fuser -k 3101/tcp
 ```
 
 ## Security Considerations

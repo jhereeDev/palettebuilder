@@ -68,7 +68,7 @@ server {
     server_name 192.168.1.12;
 
     location / {
-        proxy_pass http://localhost:3000;
+        proxy_pass http://localhost:3101;
         proxy_http_version 1.1;
         proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -96,7 +96,7 @@ sudo systemctl enable nginx
 print_header "Configuring firewall..."
 sudo ufw allow 22/tcp
 sudo ufw allow 80/tcp
-sudo ufw allow 3000/tcp
+sudo ufw allow 3101/tcp
 sudo ufw --force enable
 
 print_status "Server setup completed successfully! 🎉"
@@ -104,4 +104,4 @@ print_status "Next steps:"
 print_status "1. Clone your repository: git clone <your-repo-url> /var/www/palettebuilder"
 print_status "2. Copy env.production.example to .env and update with your values"
 print_status "3. Run ./scripts/deploy.sh to deploy the application"
-print_status "4. Your application will be available at http://192.168.1.12"
+print_status "4. Your application will be available at http://192.168.1.12:3101"
