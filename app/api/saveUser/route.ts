@@ -1,44 +1,58 @@
 // src/app/api/saveUser/route.ts
 
-import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
-import { users } from '@/lib/schema';
-import { eq } from 'drizzle-orm';
+import { NextRequest, NextResponse } from "next/server";
+import { db } from "@/lib/db";
+import { users } from "@/lib/schema";
+import { eq } from "drizzle-orm";
 
 export async function POST(request: NextRequest) {
-	const { clerkId, email } = await request.json();
+  const { clerkId, email } = await request.json();
 
-	if (!clerkId || !email) {
-		return NextResponse.json({ error: 'Clerk ID and email are required' }, { status: 400 });
-	}
+  if (!clerkId || !email) {
+    return NextResponse.json(
+      { error: "Clerk ID and email are required" },
+      { status: 400 }
+    );
+  }
 
-	try {
-		// First, check if user exists by clerkId
-		const existingUserByClerkId = await db.select().from(users).where(eq(users.clerkId, clerkId)).limit(1);
+  try {
+    // First, check if user exists by clerkId
+    const existingUserByClerkId = await db
+      .select()
+      .from(users)
+      .where(eq(users.clerkId, clerkId))
+      .limit(1);
 
-		if (existingUserByClerkId.length > 0) {
-			return NextResponse.json(existingUserByClerkId[0], { status: 200 });
-		}
+    if (existingUserByClerkId.length > 0) {
+      return NextResponse.json(existingUserByClerkId[0], { status: 200 });
+    }
 
-		// If not found by clerkId, check if user exists by email
-		const existingUserByEmail = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    // If not found by clerkId, check if user exists by email
+    const existingUserByEmail = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1);
 
-		if (existingUserByEmail.length > 0) {
-			// Update the existing user's clerkId
-			const updatedUser = await db
-				.update(users)
-				.set({ clerkId })
-				.where(eq(users.email, email))
-				.returning();
-			
-			return NextResponse.json(updatedUser[0], { status: 200 });
-		}
+    if (existingUserByEmail.length > 0) {
+      // Update the existing user's clerkId
+      const updatedUser = await db
+        .update(users)
+        .set({ clerkId })
+        .where(eq(users.email, email))
+        .returning();
 
-		// If no existing user found, create a new one
-		const newUser = await db.insert(users).values({ clerkId, email }).returning();
-		return NextResponse.json(newUser[0], { status: 201 });
-	} catch (error) {
-		console.error('Error saving user:', error);
-		return NextResponse.json({ error: 'Error saving user' }, { status: 500 });
-	}
+      return NextResponse.json(updatedUser[0], { status: 200 });
+    }
+
+    // If no existing user found, create a new one
+    const newUser = await db
+      .insert(users)
+      .values({ clerkId, email })
+      .returning();
+    return NextResponse.json(newUser[0], { status: 201 });
+  } catch (error) {
+    console.error("Error saving user:", error);
+    return NextResponse.json({ error: "Error saving user" }, { status: 500 });
+  }
 }
