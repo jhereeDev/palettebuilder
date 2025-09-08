@@ -1,23 +1,12 @@
 // middleware.ts
 
-import { authMiddleware } from '@clerk/nextjs/server';
-import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
-import { users } from '@/lib/schema';
-import { eq } from 'drizzle-orm';
+import { NextResponse } from "next/server";
 
-export default authMiddleware({
-	publicRoutes: ['/', '/api/webhooks(.*)'],
-	async afterAuth(auth, req) {
-		if (!auth.userId && !auth.isPublicRoute) {
-			return NextResponse.redirect(new URL('/', req.url));
-		}
-
-		// All features are now accessible to all authenticated users
-		return NextResponse.next();
-	},
-});
+export function middleware(request: Request) {
+  // No authentication middleware - all routes are public
+  return NextResponse.next();
+}
 
 export const config = {
-	matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
+  matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
 };

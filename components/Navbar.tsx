@@ -1,52 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/common/mode-toggle";
-import {
-  SignedIn,
-  SignedOut,
-  SignInButton,
-  UserButton,
-  useUser,
-} from "@clerk/nextjs";
 import Image from "next/image";
-import { useSubscription } from "@/hooks/useSubscription";
 import { useRouter } from "next/navigation";
 
 export default function Navbar() {
   const router = useRouter();
-  const { isPremium } = useSubscription();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { isSignedIn, user } = useUser();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
-
-  useEffect(() => {
-    if (isSignedIn && user) {
-      const saveUser = async () => {
-        try {
-          const response = await fetch("/api/saveUser", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              clerkId: user.id,
-              email: user.primaryEmailAddress?.emailAddress,
-            }),
-          });
-          if (!response.ok) {
-            throw new Error("Failed to save user");
-          }
-        } catch (error) {
-          console.error("Error saving user:", error);
-        }
-      };
-      saveUser();
-    }
-  }, [isSignedIn, user]);
 
   return (
     <nav className="shadow-sm">
@@ -74,39 +41,25 @@ export default function Navbar() {
                 Home
               </Link>
 
-              <SignedIn>
-                {isPremium && (
-                  <>
-                    <Link
-                      href="/saved"
-                      className="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium hover:border-gray-300"
-                    >
-                      Saved
-                    </Link>
+              <Link
+                href="/saved"
+                className="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium hover:border-gray-300"
+              >
+                Saved
+              </Link>
 
-                    <Link
-                      href="/browse"
-                      className="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium hover:border-gray-300"
-                    >
-                      Browse
-                    </Link>
-                  </>
-                )}
-              </SignedIn>
+              <Link
+                href="/browse"
+                className="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium hover:border-gray-300"
+              >
+                Browse
+              </Link>
             </div>
           </div>
           <div className="hidden sm:ml-6 sm:flex sm:items-center">
-            <SignedOut>
-              <SignInButton />
-            </SignedOut>
-            <SignedIn>
-              <Button asChild className="mr-4 rounded-full">
-                <Link href="/pricing">Pricing</Link>
-              </Button>
-              <div className="mx-1 mt-2">
-                <UserButton afterSignOutUrl="/" />
-              </div>
-            </SignedIn>
+            <Button asChild className="mr-4 rounded-full">
+              <Link href="/pricing">Pricing</Link>
+            </Button>
             <div className="ml-4">
               <ModeToggle />
             </div>
@@ -166,37 +119,23 @@ export default function Navbar() {
           >
             Home
           </Link>
-          <SignedIn>
-            {isPremium && (
-              <>
-                <Link
-                  href="/saved"
-                  className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700"
-                >
-                  Saved
-                </Link>
-                <Link
-                  href="/browse"
-                  className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700"
-                >
-                  Browse
-                </Link>
-              </>
-            )}
-          </SignedIn>
+          <Link
+            href="/saved"
+            className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700"
+          >
+            Saved
+          </Link>
+          <Link
+            href="/browse"
+            className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700"
+          >
+            Browse
+          </Link>
         </div>
         <div className="pt-4 pb-3 border-t border-gray-200 flex justify-between items-center">
-          <SignedOut>
-            <SignInButton />
-          </SignedOut>
-          <SignedIn>
-            <Button asChild className="ml-4 rounded-full">
-              <Link href="/pricing">Pricing</Link>
-            </Button>
-            <div className="mx-2">
-              <UserButton />
-            </div>
-          </SignedIn>
+          <Button asChild className="ml-4 rounded-full">
+            <Link href="/pricing">Pricing</Link>
+          </Button>
           <div className="mx-2">
             <ModeToggle />
           </div>

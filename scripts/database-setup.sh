@@ -53,6 +53,10 @@ fi
 
 print_status "Database connection verified ✓"
 
+# Install dependencies first
+print_status "Installing dependencies..."
+npm install
+
 # Run database migrations
 print_status "Running database migrations..."
 npm run db:push

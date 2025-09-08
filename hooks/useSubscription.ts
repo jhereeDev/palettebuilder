@@ -1,16 +1,14 @@
 // hooks/useSubscription.ts
 
-import { useState, useEffect } from 'react';
-import { useUser } from '@clerk/nextjs';
+import { useState } from "react";
 
 export function useSubscription() {
-	const { user } = useUser();
-	const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-	// All features are now accessible to all users
-	const isPremium = true;
-	const subscriptionTier = 'premium';
-	const subscriptionStatus = 'active';
+  // All features are now accessible to all users without authentication
+  const isPremium = true;
+  const subscriptionTier = "premium";
+  const subscriptionStatus = "active";
 
-	return { subscriptionTier, subscriptionStatus, isPremium, isLoading };
+  return { subscriptionTier, subscriptionStatus, isPremium, isLoading };
 }
